@@ -1,0 +1,12 @@
+Customer_ID,Age,Gender,Account_Balance,Transaction_Amount,Transaction_type,Loan_Approved
+1001,34,Female,15000,5000,Deposit,1
+1002,45,Male,8000,1000,Withdrawal,0
+1003,28,Female,2200,1500,Deposit,1
+1004,30,Female,4500,2000,Withdrawal,0
+1004,46,Male,6700,1500,Deposit,1
+1005,60,Female,9500,4500,Withdrawal,0
+1006,24,Male,18000,12000,Deposit,1
+1007,39,Female,12000,6000,Withdrawal,0
+1008,55,Male,40000,2000,Deposit,1
+1009,40,Female,5200,1200,Withdrawal,0
+1010,44,Male,7800,4000,Deposit,1
