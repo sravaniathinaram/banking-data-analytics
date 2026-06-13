@@ -1,59 +1,102 @@
-# BANKING SYSTEM DATA ANALYSIS
-
-# Step 1: Import Libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Step 2: Load Dataset
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    classification_report
+)
+
 df = pd.read_csv("bank_data.csv")
 
-# Step 3: Basic Info
+print("First 5 Records")
 print(df.head())
+print("\nDataset Information")
 print(df.info())
+
+print("\nMissing Values")
+print(df.isnull().sum())
+
+
+df.drop_duplicates(inplace=True)
+
+df.fillna(df.median(numeric_only=True), inplace=True)
+
+print("\nData Cleaned Successfully")
+
+
+print("\nStatistical Summary")
 print(df.describe())
 
-# Step 4: Data Cleaning
-df = df.drop_duplicates()
-df = df.dropna(subset=["Age", "Account_Balance", "Credit_Score"])  # Remove missing key data
 
-# Handle outliers
-df["Account_Balance"] = np.where(df["Account_Balance"] > df["Account_Balance"].quantile(0.99),
-                                 df["Account_Balance"].quantile(0.99),
-                                 df["Account_Balance"])
-
-# Step 5: Exploratory Data Analysis
-sns.histplot(df["Account_Balance"], bins=30, kde=True)
-plt.title("Distribution of Account Balance")
+plt.figure(figsize=(8,5))
+sns.histplot(df['Age'], bins=20, kde=True)
+plt.title("Age Distribution")
 plt.show()
 
-sns.boxplot(x="Gender", y="Account_Balance", data=df)
-plt.title("Account Balance by Gender")
+plt.figure(figsize=(8,5))
+sns.histplot(df['Account_Balance'], bins=20, kde=True)
+plt.title("Account Balance Distribution")
 plt.show()
 
-sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm")
-plt.title("Correlation Heatmap")
+plt.figure(figsize=(6,4))
+sns.countplot(x='Loan_Approved', data=df)
+plt.title("Loan Approval Status")
+plt.show()
+plt.figure(figsize=(8,6))
+sns.heatmap(
+    df.corr(numeric_only=True),
+    annot=True,
+    cmap='coolwarm'
+)
+plt.title("Correlation Matrix")
 plt.show()
 
-# Step 6: Feature Analysis
-avg_balance = df.groupby("Branch_Code")["Account_Balance"].mean().sort_values(ascending=False)
-print("Top Branches by Average Balance:")
-print(avg_balance.head())
 
-# Step 7: Predictive Modeling (Optional Example)
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, accuracy_score
+features = [
+    'Age',
+    'Account_Balance',
+    'Transaction_Amount'
+]
 
-X = df[["Age", "Account_Balance", "Transaction_Count", "Credit_Score", "Loan_Amount"]]
-y = df["Is_Default"]
+X = df[features]
+y = df['Loan_Approved']
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
 
-model = RandomForestClassifier(random_state=42)
+
+
+model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
+predictions = model.predict(X_test)
+accuracy = accuracy_score(y_test, predictions)
 
-print("Accuracy:", accuracy_score(y_test, y_pred))
-print(classification_report(y_test, y_pred))
+print("\nAccuracy Score")
+print(accuracy)
+
+print("\nConfusion Matrix")
+print(confusion_matrix(y_test, predictions))
+
+print("\nClassification Report")
+print(classification_report(y_test, predictions))
+new_customer = pd.DataFrame({
+    'Age': [35],
+    'Account_Balance': [18000],
+    'Transaction_Amount': [5000]
+})
+
+prediction = model.predict(new_customer)
+
+if prediction[0] == 1:
+    print("\nLoan Approved")
+else:
+    print("\nLoan Not Approved")
